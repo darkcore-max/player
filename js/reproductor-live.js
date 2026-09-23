@@ -1,4 +1,3 @@
-module.exports = `
 (function() {
     var hls = null, _v, _ui, uiTimeout;
 
@@ -18,20 +17,15 @@ module.exports = `
         if (!c) return;
 
         var st = document.createElement('style');
-        st.innerHTML = \`
+        st.innerHTML = `
             :root { --jw-blue: #007aff; --jw-white: #ffffff; }
             * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; outline: none; }
             
-            /* Contenedor sin bordes ni fondos extra */
             #tvgo-player { background: #000; font-family: -apple-system, sans-serif; position: relative; width: 100%; height: 100%; overflow: hidden; }
-            
             .video-box { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
-            
-            /* Forzar ocultar controles nativos */
             video::-webkit-media-controls { display:none !important; }
             .tvgo-video { width: 100%; height: 100%; object-fit: contain; background: #000; }
             
-            /* UI Minimalista: Solo un degradado suave abajo */
             .tvgo-ui { 
                 position: absolute; inset: 0; z-index: 100; display: flex; flex-direction: column; justify-content: flex-end; 
                 background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, transparent 40%); 
@@ -39,13 +33,11 @@ module.exports = `
             }
             .ui-hidden { opacity: 0; pointer-events: none; }
 
-            /* Barra de Controles */
             .jw-bar { display: flex; align-items: center; justify-content: space-between; width: 100%; height: 45px; }
             .jw-group { display: flex; align-items: center; gap: 25px; }
             .jw-icon { font-size: 20px; color: var(--jw-white); cursor: pointer; filter: drop-shadow(0 0 3px rgba(0,0,0,0.8)); transition: 0.2s; }
             .jw-icon:hover { color: var(--jw-blue); }
 
-            /* Menú de Calidad Flotante */
             .jw-popup { 
                 position: absolute; bottom: 65px; right: 15px; background: rgba(20,20,20,0.95); 
                 backdrop-filter: blur(10px); border-radius: 10px; width: 160px; display: none; 
@@ -57,7 +49,6 @@ module.exports = `
             .jw-item:hover { background: rgba(255,255,255,0.1); }
             .jw-item.active { color: var(--jw-blue); font-weight: bold; }
 
-            /* Indicador Live */
             .jw-live { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 1px; }
             .jw-dot { width: 8px; height: 8px; background: #ff3b30; border-radius: 50%; box-shadow: 0 0 8px #ff3b30; animation: blink 1.5s infinite; }
             @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
@@ -68,10 +59,10 @@ module.exports = `
                 border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; display: none; z-index: 105; 
             }
             @keyframes spin { to { transform: translate(-50%,-50%) rotate(360deg); } }
-        \`;
+        `;
         document.head.appendChild(st);
 
-        c.innerHTML = \`
+        c.innerHTML = `
             <div class="video-box" id="vCont">
                 <div class="loader" id="vLoad"></div>
                 <video class="tvgo-video" id="v_t" playsinline webkit-playsinline></video>
@@ -88,7 +79,7 @@ module.exports = `
                         </div>
                     </div>
                 </div>
-            </div>\`;
+            </div>`;
 
         _v = document.getElementById('v_t'); _ui = document.getElementById('ui_l');
         var _vCont = document.getElementById('vCont'), _sMenu = document.getElementById('sMenu');
@@ -99,7 +90,6 @@ module.exports = `
             uiTimeout = setTimeout(() => { if(!_sMenu.classList.contains('show')) _ui.classList.add('ui-hidden'); }, 3500); 
         }
 
-        // CONTROL PANTALLA COMPLETA (Icono Inteligente)
         document.getElementById('btnFull').onclick = (e) => {
             e.stopPropagation();
             if (!document.fullscreenElement && !document.webkitFullscreenElement) {
@@ -121,9 +111,9 @@ module.exports = `
 
         function renderMenu() {
             let h = '<div style="padding:12px; font-size:10px; color:#777; font-weight:800; border-bottom:1px solid #333">CALIDAD</div>';
-            h += \`<div class="jw-item \${hls.currentLevel===-1?'active':''}" onclick="setQ(-1)">Automático</div>\`;
+            h += `<div class="jw-item ${hls.currentLevel===-1?'active':''}" onclick="setQ(-1)">Automático</div>`;
             hls.levels.forEach((l, i) => {
-                h += \`<div class="jw-item \${hls.currentLevel===i?'active':''}" onclick="setQ(\${i})">\${l.height}p</div>\`;
+                h += `<div class="jw-item ${hls.currentLevel===i?'active':''}" onclick="setQ(${i})">${l.height}p</div>`;
             });
             _sMenu.innerHTML = h;
         }
@@ -133,8 +123,8 @@ module.exports = `
         function load(url) {
             if (Hls.isSupported()) {
                 hls = new Hls(); hls.loadSource(url); hls.attachMedia(_v);
-                hls.on(Hls.Events.MANIFEST_PARSED, () => { renderMenu(); _v.play(); });
-            } else if (_v.canPlayType('application/vnd.apple.mpegurl')) { _v.src = url; _v.play(); }
+                hls.on(Hls.Events.MANIFEST_PARSED, () => { renderMenu(); });
+            } else if (_v.canPlayType('application/vnd.apple.mpegurl')) { _v.src = url; }
         }
 
         _v.onwaiting = () => document.getElementById('vLoad').style.display = 'block';
@@ -152,4 +142,3 @@ module.exports = `
     }
     loadRes();
 })();
-`;
